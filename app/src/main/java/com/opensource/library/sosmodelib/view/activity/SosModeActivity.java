@@ -1,22 +1,71 @@
 package com.opensource.library.sosmodelib.view.activity;
 
-import android.net.Uri;
+import android.content.Context;
+import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
-import com.opensource.library.sosmodelib.view.fragment.SosModeFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+import com.opensource.library.sosmodelib.R;
+import com.opensource.library.sosmodelib.databinding.ActivitySosModeBinding;
+import com.opensource.library.sosmodelib.model.IDUser;
+import com.opensource.library.sosmodelib.viewmodel.SosModeViewModel;
 
-public class SosModeActivity extends AppCompatActivity implements SosModeFragment.OnFragmentInteractionListener {
+import java.util.List;
+
+public class SosModeActivity<T extends ClusterItem> extends MapActivity implements SosModeViewModel.DataListener {
+
+    private static final String ID_USER = "ID_USER";
+    private ActivitySosModeBinding binding;
+    private SosModeViewModel viewModel;
+    private IDUser[] idUser;
+
+    public static Intent getStartIntent(Context context, IDUser[] idUser) {
+        Intent intent = new Intent(context, SosModeActivity.class);
+        intent.putExtra(ID_USER, idUser);
+        return intent;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent().hasExtra(ID_USER)) {
+            idUser = (IDUser[]) getIntent().getParcelableArrayExtra(ID_USER);
+        }
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sos_mode);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        getSupportFragmentManager().beginTransaction().add(R.id.map_container, mapFragment).commit();
+        mapFragment.getMapAsync(this);
+
+        viewModel = new SosModeViewModel(this, this);
 
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void setUpClusterer() {
+        clusterManager = new ClusterManager<T>(this, googleMap);
+        super.setUpClusterer();
+    }
 
+    @Override
+    public void addClusterItem(List clusterItems) {
+        super.addClusterItem(clusterItems);
+        setBounds(clusterItems);
     }
 }
