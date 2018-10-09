@@ -2,14 +2,14 @@ package com.opensource.library.sosmodelib.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.opensource.library.sosmodelib.R;
 import com.opensource.library.sosmodelib.databinding.ActivitySosModeBinding;
@@ -18,7 +18,7 @@ import com.opensource.library.sosmodelib.viewmodel.SosModeViewModel;
 
 import java.util.List;
 
-public class SosModeActivity<T extends ClusterItem> extends MapActivity implements SosModeViewModel.DataListener {
+public class SosModeActivity extends MapActivity implements SosModeViewModel.DataListener {
 
     private static final String ID_USER = "ID_USER";
     private ActivitySosModeBinding binding;
@@ -59,7 +59,7 @@ public class SosModeActivity<T extends ClusterItem> extends MapActivity implemen
 
     @Override
     public void setUpClusterer() {
-        clusterManager = new ClusterManager<T>(this, googleMap);
+        clusterManager = new ClusterManager(this, googleMap);
         super.setUpClusterer();
     }
 
